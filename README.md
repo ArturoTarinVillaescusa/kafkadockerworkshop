@@ -33,8 +33,9 @@
 
 ## 1 Document objective
 
- Este proyecto es un tutorial para preparar en nuestro portátil o PC un laboratorio de contenedores Docker instanciados
- a partir de imágenes de la última versión de Confluent Kafka, con la siguiente arquitectura:
+ The content of this project consists of a simple workshop that will allow you to prepare on your laptop
+ a Docker container laboratory instantiated from images of the latest version of Confluent Kafka, with
+ the following architecture:
 
 ![alt text](imagenes/multi-dc-setup.png "Arquitectura recomendada")
 
