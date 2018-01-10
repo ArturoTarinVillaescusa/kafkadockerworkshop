@@ -42,42 +42,28 @@
 
 ## 2 Hardware Requirements
 
- El portátil en el que vamos a instalar el laboratorio debe de tener al menos la siguiente configuración:
+ The minimum hardware requirements are:
 
-   - 16 Gb de RAM
-   - 30 GB libres en disco
+   - 16 Gb RAM (8 GB could be too low)
+   - 30 GB disk
 
 ## 3 Software Requirements
 
- Para poder seguir los ejercicios de este tutorial necesitaremos disponer de un entorno que permita la virtualización de
- contenedores mediante Docker Compose, así como de los scripts y archivos de configuración contenidos en este proyecto
- de IntelliJ.
+ In order to follow the exercises in this tutorial we will need to install in our laptop
+ Docker, Docker Compose and JMeter.
 
- A continuación presentamos tres alternativas para conseguirlo:
+ ***[Windows 7 laptops](./InstalarEnWindows7.md)***, install Docker, Docker Compose and VirtualBox
 
- ***Opción 1***
-
- [Para usuarios de Windows que no quieran instalar Docker en su portátil](./UsarVBoxImage.md),
- pedir al equipo de arquitectura la máquina virtual de VirtualBox llamada "WorkshopVM", arrancarla, abrir una sesión en ella y
- clonar este proyecto de Git desde la misma.
-
- ***Opción 2***
-
- [Para usuarios de Windows 7](./InstalarEnWindows7.md), instalar Docker, Docker Compose y VirtualBox, descargar este proyecto en su máquina local y
- seguir los pasos indicados en el resto del documento actual.
-
- ***Opción 3***
-
- [Para usuarios de Ubuntu](./InstalarEnUbuntu.md), instalar Docker y Docker Compose y seguir los pasos indicados en el resto del documento
- actual.
+ ***[Ubuntu laptops](./InstalarEnUbuntu.md)***, install Docker and Docker Compose.
 
 ## 4 Exercises
 
- La estructura de carpetas de este proyecto es la siguiente:
+ This is our Git project structure, clone it in your laptop and open it with your prefered IDE. I've used
+ IntelliJ:
 
     ~/ $ tree
     .
-    └── WorkshopVM
+    └── Workshop
         ├── docker
         │   ├── linux
         │   │   ├── db2elkmysql.yml
@@ -114,15 +100,13 @@
             └── testJmeter.sh
 
 
-
 ### 4-1 Starting and Stopping your laboratory
 
-  Hemos proporcionado un script llamado LABORATORIO.sh que utiliza el archivo de configuración LABORATORIO.conf
-  para facilitar el arranque y la parada del entorno
+  You'll find the "scripts" folder, and there the LABORATORIO.sh script. This uses a config
+  file called LABORATORIO.conf. This will help you to tweak your lab, adding or removing racks,
+  nodes, changing docker image versions and forwarding to different ports.
 
-  ***Archivo de configuración del laboratorio***
-
-  Está ubicado dentro de la carpeta scripts/conf del laboratorio. Tiene este contenido:
+  ***Config file content***
 
         $ cat config/LABORATORIO.conf
 
@@ -149,13 +133,12 @@
         REINICIAR                        on-failure:1
         RED                              confluent-network
 
-  ***Script de arranque, parada, verificación y borrado del laboratorio***
+  ***Start, stop, check and reset our lab's containers***
 
-   Está ubicado dentro de la carpeta scripts/conf del laboratorio. Si lanzamos el script sin parámetros nos indica el modo de uso:
 
      $ ./LABORATORIO.sh
 
-        Forma de uso:
+        Use:
 
         ./LABORATORIO.sh iniciar [dc1|todoslosdatacenter] <db2> <elastic> <kibana> <mysql> <oracle>
 
@@ -179,38 +162,37 @@
           * 'mysql' arranca un contenedor de MySql.
           * 'oracle' arranca un contenedor de Oracle XE.
 
-   Si queremos ***arrancar el laboratorio*** llamaremos al script con el parámetro 'iniciar' seguido de los entornos que necesitamos arrancar.
-   Por ejemplo, si queremos arrancar sólo el datacenter principal y la base de datos DB2 ejecutaremos este comando:
+   ***start our lab*** use the 'iniciar' parameter, followed by what you want to start.
+   If you i.e. want to launch the main datacenter and a db2 datacenter, run this command:
 
         $ ./LABORATORIO.sh iniciar dc1 db2
 
-   Otro ejemplo, para arrancar todos los datacenter y ELK:
+   To start all the datacenter indicated in the INDICE_REPLICACION_DATACENTER config parameter and y ELK:
 
         $ ./LABORATORIO.sh iniciar todoslosdatacenter elastic kibana
 
-   ***Para parar las máquinas del laboratorio*** indicaremos que queremos 'parar' en el primer parámetro, y en el segundo
-   indicaremos lo que vamo a parar.
+   ***Stop your lab*** use 'parar' as first parameter, and next say what you want to stop.
 
-   Por ejemplo, si queremos parar el datacenter secundario usaríamos este comando:
+   If you i.e. want to stop secondary datacenter dc2, use this:
 
      $ ./LABORATORIO.sh parar dc2
 
-   Si queremos parar todos los entornos de persistencia usaremos este comando:
+   If you want to stop all the persistency containers, use this:
 
      $ ./LABORATORIO.sh parar bd
 
-   Si queremos parar todo el laboratorio se hace con este comando:
+   If you want to stop everything, use this:
 
      $ ./LABORATORIO.sh parar todo
 
-   Podemos ***verificar*** en qué estado se encuentra el laboratorio con este comando:
+   ***Verify*** what's going on with your lab machines using this parameter:
 
      $ ./LABORATORIO.sh verificar
 
-   Por último, si queremos ***resetear*** el entorno eliminando los archivos temporales, los tópicos y cualquier
-   rastro que pueda haber modificado y/o estropeado algún contenedor del laboratorio con este comando:
+   ***Reset*** your lab to the initial state cleaning temporary archives and removing topics. This will set
+   your lab ootb, wiping out any trace of modifications, broken files, full disks, machines not starting ...:
 
-     $ ./LABORATORIO.sh verificar
+     $ ./LABORATORIO.sh borrar
 
 ### 4-2 Messaging Tests
 
