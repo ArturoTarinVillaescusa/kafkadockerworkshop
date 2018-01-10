@@ -1,22 +1,22 @@
 # WorkshopVM
 
 # Tabla de contenido
-1. [Objetivo del documento](#1-objetivo-del-documento)
-2. [Requisitos hardware](#2-requisitos-hardware)
-3. [Requisitos software](#3-requisitos-software)
-4. [Ejercicios](#4-ejercicios)
+1. [Document objective](#1-document-objective)
+2. [Hardware Requirements](#2-hardware-requirements)
+3. [Software Requirements](#3-software-requirements)
+4. [Exercises](#4-exercises)
 
-4.1. [Arranque y parada del laboratorio](##4-1-arranque-y-parada-del-laboratorio)
+4.1. [Starting and Stopping your laboratory](##4-1-starting-and-stopping-your-laboratory)
 
-4.2. [Pruebas de mensajería](##4-2-pruebas-de-mensajeria)
+4.2. [Messaging Tests](##4-2-messaging-tests)
 
-4.2.1. [Envío y consumo de mensajes desde un tópico usando los comandos de Apache Kafka](###4-2-1-envío-y-consumo-de-mensajes-desde-un-tópico-usando-los-comandos-de-apache-kafka)
+4.2.1. [Publish-Subscribe messaging using command line Kafka scripts](###4-2-1-publish-subscribe-messaging-using-command-line-kafka-scripts)
 
-4.2.2. [Réplica de mensajes entre clusters con MirrorMaker](###4-2-2-réplica-de-mensajes-entre-clusters-con-mirrormaker)
+4.2.2. [MirrorMaker message replication between clusters](###4-2-2-mirrormaker-replication-between-clusters)
 
-4.2.3. [Réplica entre clusters con Enterprise Replicator](###4-2-3-réplica-entre-clusters-con-enterprise-replicator)
+4.2.3. [Enterprise Replicator message replication between clusters](###4-2-3-enterprise-replicator-replication-between-clusters)
 
-4.2.4. [Pruebas de carga con JMeter](###4-2-4-pruebas-de-carga-con-jmeter)
+4.2.4. [JMeter stress tests](###4-2-4-jmeter-stress-tests)
 
 4.2.4.1. [LINEA BASE PRODUCTOR ONLINE](####4-2-4-1-linea-base-productor-online)
 
@@ -31,21 +31,21 @@
 4.2.4.6. [PRODUCTOR_INCREMENTAL](####4-2-4-6-productor-incremental)
 
 
-## 1 Objetivo del documento
+## 1 Document objective
 
  Este proyecto es un tutorial para preparar en nuestro portátil o PC un laboratorio de contenedores Docker instanciados
  a partir de imágenes de la última versión de Confluent Kafka, con la siguiente arquitectura:
 
 ![alt text](imagenes/multi-dc-setup.png "Arquitectura recomendada")
 
-## 2 Requisitos hardware
+## 2 Hardware Requirements
 
  El portátil en el que vamos a instalar el laboratorio debe de tener al menos la siguiente configuración:
 
    - 16 Gb de RAM
    - 30 GB libres en disco
 
-## 3 Requisitos software
+## 3 Software Requirements
 
  Para poder seguir los ejercicios de este tutorial necesitaremos disponer de un entorno que permita la virtualización de
  contenedores mediante Docker Compose, así como de los scripts y archivos de configuración contenidos en este proyecto
@@ -69,7 +69,7 @@
  [Para usuarios de Ubuntu](./InstalarEnUbuntu.md), instalar Docker y Docker Compose y seguir los pasos indicados en el resto del documento
  actual.
 
-## 4 Ejercicios
+## 4 Exercises
 
  La estructura de carpetas de este proyecto es la siguiente:
 
@@ -113,7 +113,7 @@
 
 
 
-### 4-1 Arranque y parada del laboratorio
+### 4-1 Starting and Stopping your laboratory
 
   Hemos proporcionado un script llamado LABORATORIO.sh que utiliza el archivo de configuración LABORATORIO.conf
   para facilitar el arranque y la parada del entorno
@@ -210,16 +210,16 @@
 
      $ ./LABORATORIO.sh verificar
 
-### 4-2 Pruebas de mensajería
+### 4-2 Messaging Tests
 
   Vamos lanzar unas cuantas pruebas de mensajería:
 
     - Envío y consumo de mensajes desde un tópico usando los comandos de Kafka
     - Réplica entre clusters con MirrorMaker
-    - Réplica entre clusters con Enterprise Replicator
-    - Pruebas de carga con JMeter
+    - Enterprise Replicator message replication between clusters
+    - JMeter stress tests
 
-### 4-2-1 Envío y consumo de mensajes desde un tópico usando los comandos de Apache Kafka
+### 4-2-1 Publish-Subscribe messaging using command line Kafka scripts
 
  Nuestra primera prueba consiste en asegurarnos mediante los scripts que proporciona Kafka, que los tres broker del cluster
  de nuestro laboratorio trabajan realmente en modo cluster.
@@ -309,7 +309,7 @@
 
    - Al invocar los comandos listados, nos referiremos a los contenedores con el prefijo "windows_" en lugar de "linux_"
 
-### 4-2-2 Réplica de mensajes entre clusters con MirrorMaker
+### 4-2-2 MirrorMaker message replication between clusters
 
  Para llevar a cabo las pruebas de MirrorMaker hemos proporcionado el script mirrormaker.sh, ubicado en la carpeta "scripts"
  del repositorio de Git. Si lo lanzamos sin parámetros podemos ver cómo se usa:
@@ -397,7 +397,7 @@
             ^CProcessed a total of 10000 messages
 
 
-### 4-2-3 Réplica entre clusters con Enterprise Replicator
+### 4-2-3 Enterprise Replicator message replication between clusters
 
  Para llevar a cabo las pruebas de Enterprise Replicator hemos proporcionado el script enterprisereplicator.sh,
  ubicado en la carpeta "scripts" del repositorio de Git. Si lo lanzamos sin parámetros podemos ver cómo se usa:
@@ -469,7 +469,7 @@
             ^CProcessed a total of 6667 messages
 
 
-### 4-2-4 Pruebas de carga con JMeter
+### 4-2-4 JMeter stress tests
 
  Un requisito indispensable para realizar estas pruebas es necesario tener instalado y configurado JMeter en la máquina que
  vaya a usarse como cliente de pruebas. Para hacerlo hay que seguir estas páginas:
