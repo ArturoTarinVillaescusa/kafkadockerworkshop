@@ -13,7 +13,7 @@ import kafka.message.MessageAndMetadata
 import org.apache.spark.sql.SaveMode
 import org.apache.spark.storage.StorageLevel
 
-object ParseItronJsonsArrivingFromMicroserviceKafkaStreamSink {
+object ParseWaterMeterReadingsJsonsArrivingFromMicroserviceKafkaStreamSink {
 
   def main(args: Array[String]): Unit = {
 
@@ -22,7 +22,7 @@ object ParseItronJsonsArrivingFromMicroserviceKafkaStreamSink {
     Logger.getLogger("akka").setLevel(Level.OFF)
 
     // setup spark context
-    val sc = getSparkContext("ParseItronJsonsArrivingFromMicroserviceKafkaStreamSink")
+    val sc = getSparkContext("ParseWaterMeterReadingsJsonsArrivingFromMicroserviceKafkaStreamSink")
     val sqlContext = getSQLContext(sc)
 
     var propsConexionPostgres: Properties = new Properties()
@@ -30,7 +30,7 @@ object ParseItronJsonsArrivingFromMicroserviceKafkaStreamSink {
     propsConexionPostgres.setProperty("password", variablesAguas.clavePostgres)
     propsConexionPostgres.setProperty("driver", "org.postgresql.Driver")
 
-    val batchDuration = Seconds(variablesAguas.ventanaItron)
+    val batchDuration = Seconds(variablesAguas.ventanaWaterMeterReadings)
 
     def streamingApp(sc: SparkContext, batchDuration: Duration) = {
       val ssc = new StreamingContext(sc, batchDuration)
@@ -70,12 +70,12 @@ object ParseItronJsonsArrivingFromMicroserviceKafkaStreamSink {
           )
       }
 
-      val itronStream = kafkaDirectStream.transform(rddItron => {
-            transforma_json_de_ms_a_RDD_Lecturas(rddItron)
+      val WaterMeterReadingsStream = kafkaDirectStream.transform(rddWaterMeterReadings => {
+            transforma_json_de_ms_a_RDD_Lecturas(rddWaterMeterReadings)
           }
         )
 
-      itronStream.foreachRDD { rdd =>
+      WaterMeterReadingsStream.foreachRDD { rdd =>
         println("Transformando lecturas provinientes de los json que el microservicio principal deposita en la cola 'lecturas' ...")
 
         if (!rdd.isEmpty()) {
