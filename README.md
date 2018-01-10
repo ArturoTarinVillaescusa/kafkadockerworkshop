@@ -33,9 +33,8 @@
 
 ## 1 Document objective
 
- The content of this project consists of a simple workshop that will allow you to prepare on your laptop
- a Docker container laboratory instantiated from images of the latest version of Confluent Kafka, with
- the following architecture:
+ Following the steps of this workshop will give you a full Kafka cluster lab to run in your laptop.
+ This is the architecture that you may expect to have:
 
 ![alt text](imagenes/multi-dc-setup.png "Arquitectura recomendada")
 
