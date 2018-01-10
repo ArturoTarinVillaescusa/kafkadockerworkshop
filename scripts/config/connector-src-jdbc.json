@@ -1,0 +1,16 @@
+{
+	"name": "CONNECTOR-SRC-JDBC-TEST",
+	"config": {
+		"connector.class": "JdbcSourceConnector",
+		"connection.url": "jdbc:db2://dc1_db2_1:50000/sample",
+        "connection.user": "db2inst1",
+        "connection.password": "cl@v301",
+		"mode": "timestamp+incrementing",
+		"query": "SELECT NUMPERSO, LOCALIDA, DIRECCIO, ID_COL, CHGTMST FROM SPCT37_DIRECCIONES WHERE CHGTMST < ? AND ((CHGTMST = ? AND ID_COL > ?) OR CHGTMST > ?) ORDER BY CHGTMST,ID_COL ASC FETCH FIRST 500 ROWS ONLY",
+		"incrementing.column.name": "ID_COL",
+		"timestamp.column.name": "CHGTMST",
+		"topic.prefix": "topic_test",
+		"poll.interval.ms": "10",
+		"batch.size": "25000"
+	}
+}

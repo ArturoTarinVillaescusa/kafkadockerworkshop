@@ -1,0 +1,19 @@
+#!/bin/bash
+
+su - db2inst1 <<'EOF'
+  db2 connect to sample
+  for i in {1..100}
+  do
+      db2 """insert into SPCT37_DIRECCIONES(NUMPERSO, EMPRESA, TIPDIR, PRIORIDA, DIRECCIO, CPOSTAL, LOCALIDA, PROVIN,
+             PAIS, LOCINOM, LOCINUM, INNORMAL, CDRTAPOB, CDRTAVIA, CDRTAZON, FECALTA, FEINIAPL, FEFINAPL,
+             FECULTIM, HORULTIM, USUMODI, CANMODI, FECNORMA, HOGARID, FEALHOID, FEULMIDH, INDDESGL,
+             TIPOVIA, NOMCARRE, NUMDESDE, NUMHASTA, NUMEDIFI, NUMESCAL, NUMERPIS, NUMEPORT, RESTA, INDBLOC, INIVALID, FINVALID)
+             values
+             (1.0, 5.0, 'a', 3.0, 'direccion', 46010, 'LOCALIDA', 'CS', 'ESP', 3.0,
+              4.0, 'A', 11.0, 11.0, 11.0, DATE ('2002-10-20'), 7.0, 7.0, DATE ('2002-10-21'), 7.0, 'USUMODI', 9.0,
+              7.0, 11.0, 7.0, 7.0, 'M', 'TIV', 'NOMCARRE', 5.0, 'NUMHASTA', 'NUMEDIFICI', 'NUMES', 'NUMERPIS', 'NUMEP',
+              'RESTA', 1.0, DATE ('2002-10-22'), DATE ('2002-10-23'))
+          """
+  done
+EOF
+

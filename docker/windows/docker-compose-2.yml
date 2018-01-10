@@ -1,0 +1,701 @@
+---
+version: '2'
+services:
+  zookeeperdca-1:
+    image: confluentinc/cp-zookeeper:latest
+    restart: always
+    hostname: zookeeperdca-1
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeperdca-1:22888:23888;zookeeperdca-2:32888:33888;zookeeperdca-3:42888:43888
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  zookeeperdca-2:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeperdca-2
+    restart: always
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeperdca-1:22888:23888;zookeeperdca-2:32888:33888;zookeeperdca-3:42888:43888
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  zookeeperdca-3:
+    image: confluentinc/cp-zookeeper:latest
+    restart: always
+    hostname: zookeeperdca-3
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeperdca-1:22888:23888;zookeeperdca-2:32888:33888;zookeeperdca-3:42888:43888
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafkadca-1:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    hostname: kafkadca-1
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkadca-1:9092
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafkadca-2:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    hostname: kafkadca-2
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkadca-2:9092
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafkadca-3:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    hostname: kafkadca-3
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkadca-3:9092
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  schema_registrydca-1:
+    image: confluentinc/cp-schema-registry:latest
+    restart: always
+    hostname: schema_registrydca-1
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema_registrydca-1
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+
+  schema_registrydca-2:
+    image: confluentinc/cp-schema-registry:latest
+    restart: always
+    hostname: schema_registrydca-2
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema_registrydca-2
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+
+  schema_registrydca-3:
+    image: confluentinc/cp-schema-registry:latest
+    restart: always
+    hostname: schema_registrydca-3
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema_registrydca-3
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+
+  kafka-connectdca-1:
+    image: confluentinc/cp-kafka-connect:latest
+    restart: always
+    hostname: kafka-connectdca-1
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+      - schema_registrydca-1
+      - schema_registrydca-2
+      - schema_registrydca-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafkadca-1:9092,kafkadca-2:9092,kafkadca-3:9092
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connectdca-1
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdca-1:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdca-1:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+
+  kafka-connectdca-2:
+    image: confluentinc/cp-kafka-connect:latest
+    restart: always
+    hostname: kafka-connectdca-2
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+      - schema_registrydca-1
+      - schema_registrydca-2
+      - schema_registrydca-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafkadca-1:9092,kafkadca-2:9092,kafkadca-3:9092
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connectdca-2
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdca-2:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdca-2:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+
+  kafka-connectdca-3:
+    image: confluentinc/cp-kafka-connect:latest
+    restart: always
+    hostname: kafka-connectdca-3
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+      - schema_registrydca-1
+      - schema_registrydca-2
+      - schema_registrydca-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafkadca-1:9092,kafkadca-2:9092,kafkadca-3:9092
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connectdca-3
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdca-3:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdca-3:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+
+  kafka-restdca-1:
+    image: confluentinc/cp-kafka-rest:latest
+    restart: always
+    hostname: kafka-restdca-1
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+      - schema_registrydca-1
+      - schema_registrydca-2
+      - schema_registrydca-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      KAFKA_REST_BOOTSTRAP_SERVERS: kafkadca-1:9092,kafkadca-2:9092,kafkadca-3:9092
+      # KAFKA_REST_LISTENERS: http://kafka-restdca-1:8082,http://kafka-restdca-2:8082,http://kafka-restdca-3:8082
+      KAFKA_REST_LISTENERS: http://kafka-restdca-1:8082
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registrydca-1:8081,http://schema_registrydca-2:8081,http://schema_registrydca-3:8081
+      KAFKA_REST_HOST_NAME: kafka-restdca-1
+    ports:
+      - 1882:8082
+
+
+  kafka-restdca-2:
+    image: confluentinc/cp-kafka-rest:latest
+    restart: always
+    hostname: kafka-restdca-2
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+      - schema_registrydca-1
+      - schema_registrydca-2
+      - schema_registrydca-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      KAFKA_REST_BOOTSTRAP_SERVERS: kafkadca-1:9092,kafkadca-2:9092,kafkadca-3:9092
+      # KAFKA_REST_LISTENERS: http://kafka-restdca-1:8082,http://kafka-restdca-2:8082,http://kafka-restdca-3:8082
+      KAFKA_REST_LISTENERS: http://kafka-restdca-2:8082
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registrydca-1:8081,http://schema_registrydca-2:8081,http://schema_registrydca-3:8081
+      KAFKA_REST_HOST_NAME: kafka-restdca-2
+    ports:
+      - 1883:8082
+
+
+  kafka-restdca-3:
+    image: confluentinc/cp-kafka-rest:latest
+    restart: always
+    hostname: kafka-restdca-3
+    depends_on:
+      - zookeeperdca-1
+      - zookeeperdca-2
+      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+      - schema_registrydca-1
+      - schema_registrydca-2
+      - schema_registrydca-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+      KAFKA_REST_BOOTSTRAP_SERVERS: kafkadca-1:9092,kafkadca-2:9092,kafkadca-3:9092
+      # KAFKA_REST_LISTENERS: http://kafka-restdca-1:8082,http://kafka-restdca-2:8082,http://kafka-restdca-3:8082
+      KAFKA_REST_LISTENERS: http://kafka-restdca-3:8082
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registrydca-1:8081,http://schema_registrydca-2:8081,http://schema_registrydca-3:8081
+      KAFKA_REST_HOST_NAME: kafka-restdca-3
+    ports:
+      - 1884:8082
+
+#########################################################
+
+  zookeeperdcb-1:
+    image: confluentinc/cp-zookeeper:latest
+    restart: always
+    hostname: zookeeperdcb-1
+    depends_on:
+#      - zookeeperdca-1
+#      - zookeeperdca-2
+#      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3  
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeperdcb-1:22888:23888;zookeeperdcb-2:32888:33888;zookeeperdcb-3:42888:43888    
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  zookeeperdcb-2:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeperdcb-2
+    restart: always
+    depends_on:
+#      - zookeeperdca-1
+#      - zookeeperdca-2
+#      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeperdcb-1:22888:23888;zookeeperdcb-2:32888:33888;zookeeperdcb-3:42888:43888    
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  zookeeperdcb-3:
+    image: confluentinc/cp-zookeeper:latest
+    restart: always
+    hostname: zookeeperdcb-3
+    depends_on:
+#      - zookeeperdca-1
+#      - zookeeperdca-2
+#      - zookeeperdca-3
+      - kafkadca-1
+      - kafkadca-2
+      - kafkadca-3
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeperdcb-1:22888:23888;zookeeperdcb-2:32888:33888;zookeeperdcb-3:42888:43888
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafkadcb-1:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    hostname: kafkadcb-1
+    depends_on:
+      - zookeeperdcb-1
+      - zookeeperdcb-2
+      - zookeeperdcb-3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkadcb-1:9092
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafkadcb-2:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    hostname: kafkadcb-2
+    depends_on:
+      - zookeeperdcb-1
+      - zookeeperdcb-2
+      - zookeeperdcb-3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkadcb-2:9092
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafkadcb-3:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    hostname: kafkadcb-3
+    depends_on:
+      - zookeeperdcb-1
+      - zookeeperdcb-2
+      - zookeeperdcb-3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkadcb-3:9092
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+#  schema_registrydcb-1:
+#    image: confluentinc/cp-schema-registry:latest
+#    restart: always
+#    hostname: schema_registrydcb-1
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#    environment:
+#      SCHEMA_REGISTRY_HOST_NAME: schema_registrydcb-1
+#      # kafkastore.connection.url should be identical across all schema registry nodes. By
+#      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+#      # cluster in DC A
+#      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+#      # The Schema Registry instances in DC B have master.eligibility set to false, meaning that none can be elected master.
+#      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'false'
+#      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+#      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+#      # registry.
+#      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+#      # In DC B, make sure Kafka has unclean.leader.election.enable set to false.
+#      SCHEMA_REGISTRY_UNCLEAN_LEADER_ELECTION_ENABLE: 'false'
+#
+#  schema_registrydcb-2:
+#    image: confluentinc/cp-schema-registry:latest
+#    restart: always
+#    hostname: schema_registrydcb-2
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#    environment:
+#      SCHEMA_REGISTRY_HOST_NAME: schema_registrydcb-2
+#      # kafkastore.connection.url should be identical across all schema registry nodes. By
+#      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+#      # cluster in DC A
+#      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+#      # The Schema Registry instances in DC B have master.eligibility set to false, meaning that none can be elected master.
+#      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'false'
+#      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+#      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+#      # registry.
+#      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+#      # In DC B, make sure Kafka has unclean.leader.election.enable set to false.
+#      SCHEMA_REGISTRY_UNCLEAN_LEADER_ELECTION_ENABLE: 'false'
+#
+#  schema_registrydcb-3:
+#    image: confluentinc/cp-schema-registry:latest
+#    restart: always
+#    hostname: schema_registrydcb-3
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#    environment:
+#      SCHEMA_REGISTRY_HOST_NAME: schema_registrydcb-3
+#      # kafkastore.connection.url should be identical across all schema registry nodes. By
+#      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+#      # cluster in DC A
+#      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeperdca-1:2181,zookeeperdca-2:2181,zookeeperdca-3:2181
+#      # The Schema Registry instances in DC B have master.eligibility set to false, meaning that none can be elected master.
+#      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'false'
+#      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+#      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+#      # registry.
+#      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+#      # In DC B, make sure Kafka has unclean.leader.election.enable set to false.
+#      SCHEMA_REGISTRY_UNCLEAN_LEADER_ELECTION_ENABLE: 'false'
+#
+#  kafka-connectdcb-1:
+#    image: confluentinc/cp-kafka-connect:latest
+#    restart: always
+#    hostname: kafka-connectdcb-1
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#      - schema_registrydcb-1
+#      - schema_registrydcb-2
+#      - schema_registrydcb-3
+#    environment:
+#      CONNECT_BOOTSTRAP_SERVERS: kafkadcb-1:9092,kafkadcb-2:9092,kafkadcb-3:9092
+#      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connectdcb-1
+#      CONNECT_REST_PORT: 8083
+#      CONNECT_GROUP_ID: compose-connect-group
+#      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+#      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+#      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+#      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+#      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdcb-1:8081'
+#      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+#      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdcb-1:8081'
+#      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+#
+#  kafka-connectdcb-2:
+#    image: confluentinc/cp-kafka-connect:latest
+#    restart: always
+#    hostname: kafka-connectdcb-2
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#      - schema_registrydcb-1
+#      - schema_registrydcb-2
+#      - schema_registrydcb-3
+#    environment:
+#      CONNECT_BOOTSTRAP_SERVERS: kafkadcb-1:9092,kafkadcb-2:9092,kafkadcb-3:9092
+#      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connectdcb-2
+#      CONNECT_REST_PORT: 8083
+#      CONNECT_GROUP_ID: compose-connect-group
+#      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+#      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+#      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+#      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+#      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdcb-2:8081'
+#      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+#      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdcb-2:8081'
+#      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+#
+#  kafka-connectdcb-3:
+#    image: confluentinc/cp-kafka-connect:latest
+#    restart: always
+#    hostname: kafka-connectdcb-3
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#      - schema_registrydcb-1
+#      - schema_registrydcb-2
+#      - schema_registrydcb-3
+#    environment:
+#      CONNECT_BOOTSTRAP_SERVERS: kafkadcb-1:9092,kafkadcb-2:9092,kafkadcb-3:9092
+#      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connectdcb-3
+#      CONNECT_REST_PORT: 8083
+#      CONNECT_GROUP_ID: compose-connect-group
+#      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+#      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+#      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+#      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+#      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdcb-3:8081'
+#      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+#      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://kafka-connectdcb-3:8081'
+#      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+#
+#  kafka-restdcb-1:
+#    image: confluentinc/cp-kafka-rest:latest
+#    restart: always
+#    hostname: kafka-restdcb-1
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#      - schema_registrydcb-1
+#      - schema_registrydcb-2
+#      - schema_registrydcb-3
+#    environment:
+#      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+#      KAFKA_REST_BOOTSTRAP_SERVERS: kafkadcb-1:9092,kafkadcb-2:9092,kafkadcb-3:9092
+#      # KAFKA_REST_LISTENERS: http://kafka-restdcb-1:8082,http://kafka-restdcb-2:8082,http://kafka-restdcb-3:8082
+#      KAFKA_REST_LISTENERS: http://kafka-restdcb-1:8082
+#      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registrydcb-1:8081,http://schema_registrydcb-2:8081,http://schema_registrydcb-3:8081
+#      KAFKA_REST_HOST_NAME: kafka-restdcb-1
+#
+#
+#  kafka-restdcb-2:
+#    image: confluentinc/cp-kafka-rest:latest
+#    restart: always
+#    hostname: kafka-restdcb-2
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#      - schema_registrydcb-1
+#      - schema_registrydcb-2
+#      - schema_registrydcb-3
+#    environment:
+#      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+#      KAFKA_REST_BOOTSTRAP_SERVERS: kafkadcb-1:9092,kafkadcb-2:9092,kafkadcb-3:9092
+#      # KAFKA_REST_LISTENERS: http://kafka-restdcb-1:8082,http://kafka-restdcb-2:8082,http://kafka-restdcb-3:8082
+#      KAFKA_REST_LISTENERS: http://kafka-restdcb-2:8082
+#      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registrydcb-1:8081,http://schema_registrydcb-2:8081,http://schema_registrydcb-3:8081
+#      KAFKA_REST_HOST_NAME: kafka-restdcb-2
+#
+#
+#  kafka-restdcb-3:
+#    image: confluentinc/cp-kafka-rest:latest
+#    restart: always
+#    hostname: kafka-restdcb-3
+#    depends_on:
+#      - zookeeperdcb-1
+#      - zookeeperdcb-2
+#      - zookeeperdcb-3
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#      - schema_registrydcb-1
+#      - schema_registrydcb-2
+#      - schema_registrydcb-3
+#    environment:
+#      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeperdcb-1:2181,zookeeperdcb-2:2181,zookeeperdcb-3:2181
+#      KAFKA_REST_BOOTSTRAP_SERVERS: kafkadcb-1:9092,kafkadcb-2:9092,kafkadcb-3:9092
+#      # KAFKA_REST_LISTENERS: http://kafka-restdcb-1:8082,http://kafka-restdcb-2:8082,http://kafka-restdcb-3:8082
+#      KAFKA_REST_LISTENERS: http://kafka-restdcb-3:8082
+#      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema_registrydcb-1:8081,http://schema_registrydcb-2:8081,http://schema_registrydcb-3:8081
+#      KAFKA_REST_HOST_NAME: kafka-restdcb-3
+#    
+#  replicatordcb-1:
+#    image: confluentinc/cp-enterprise-replicator:latest
+#    # restart: on-failure:3
+#    restart: always
+#    hostname: replicatordcb-1
+#    depends_on:
+#      - kafkadcb-1
+#      - kafkadcb-2
+#      - kafkadcb-3
+#    environment:
+#      # In DC B, run Replicator with Kafka in the “master” datacenter (DC A) as the source
+#      # and Kafka in DC B as the target.
+#      CONNECT_BOOTSTRAP_SERVERS: kafkadcb-1:9092,kafkadcb-2:9092,kafkadcb-3:9092
+#      CONNECT_REST_PORT: 28082
+#      CONNECT_GROUP_ID: "default"
+#      CONNECT_CONFIG_STORAGE_TOPIC: "replicator.config"
+#      CONNECT_OFFSET_STORAGE_TOPIC: "replicator.offsets"
+#      CONNECT_STATUS_STORAGE_TOPIC: "replicator.status"
+#      CONNECT_CLEANUP_POLICY: "compact"
+#      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#      CONNECT_REST_ADVERTISED_HOST_NAME: "replicator-1"
+#      CONNECT_LOG4J_ROOT_LOGLEVEL: DEBUG
+#    volumes:
+#      - /tmp/replicator-host-cluster-test/:/tmp/test
+#    extra_hosts:
+#      - "moby:127.0.0.1"

@@ -1,0 +1,105 @@
+---
+version: '3.3'
+networks:
+  default:
+    external:
+      name: ${RED:-confluent-network}
+services:
+  kafka-connect-1:
+    image: confluentinc/cp-kafka-connect:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-connect-1_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-3_1:${BROKER_PORT:-9092}
+      CONNECT_REST_ADVERTISED_HOST_NAME: ${DATACENTER}_kafka-connect-1_1
+      CONNECT_REST_PORT: ${CONNECT_PORT:-8083}
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-1_1:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-1_1:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      CLASSPATH: /etc/kafka-connect-jdbc/db2jcc.jar:/etc/kafka-connect-jdbc/db2jcc4.jar:/etc/kafka-connect-jdbc/db2jcc_license_cu.jar
+    ports:
+      - ${CONNECT_BINDING_PORT_1:-1553}:${CONNECT_PORT:-8083}
+
+  kafka-connect-2:
+    image: confluentinc/cp-kafka-connect:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-connect-2_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},kafka-3_1:${BROKER_PORT:-9092}
+      CONNECT_REST_ADVERTISED_HOST_NAME: ${DATACENTER}_kafka-connect-2_1
+      CONNECT_REST_PORT: ${CONNECT_PORT:-8083}
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-2_1:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-2_1:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      CLASSPATH: /etc/kafka-connect-jdbc/db2jcc.jar:/etc/kafka-connect-jdbc/db2jcc4.jar:/etc/kafka-connect-jdbc/db2jcc_license_cu.jar
+    ports:
+      - ${CONNECT_BINDING_PORT_2:-1554}:${CONNECT_PORT:-8083}
+
+  kafka-connect-3:
+    image: confluentinc/cp-kafka-connect:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-connect-3_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-3_1:${BROKER_PORT:-9092}
+      CONNECT_REST_ADVERTISED_HOST_NAME: ${DATACENTER}_kafka-connect-3_1
+      CONNECT_REST_PORT: ${CONNECT_PORT:-8083}
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-3_1:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-3_1:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      CLASSPATH: /etc/kafka-connect-jdbc/db2jcc.jar:/etc/kafka-connect-jdbc/db2jcc4.jar:/etc/kafka-connect-jdbc/db2jcc_license_cu.jar
+    ports:
+      - ${CONNECT_BINDING_PORT_3:-1555}:${CONNECT_PORT:-8083}

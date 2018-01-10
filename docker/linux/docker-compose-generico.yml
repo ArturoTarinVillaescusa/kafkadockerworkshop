@@ -1,0 +1,331 @@
+---
+version: '3.3'
+networks:
+  default:
+    external:
+      name: ${RED:-confluent-network}
+services:
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_zookeeper-1_1
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT:-2181}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ${DATACENTER}_zookeeper-1_1:22888:23888;${DATACENTER}_zookeeper-2_1:32888:33888;${DATACENTER}_zookeeper-3_1:42888:43888
+#      ZOOKEEPER_SERVER_1: zookeeper-1:${ZOOKEEPER_INTERNAL_PORT_1:-22888}:${ZOOKEEPER_ELECTION_PORT_1:-23888}
+#      ZOOKEEPER_SERVER_2: zookeeper-2:${ZOOKEEPER_INTERNAL_PORT_2:-32888}:${ZOOKEEPER_ELECTION_PORT_2:-33888}
+#      ZOOKEEPER_SERVER_3: zookeeper-3:${ZOOKEEPER_INTERNAL_PORT_3:-42888}:${ZOOKEEPER_ELECTION_PORT_3:-43888}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:${CP_VERSION:-latest}
+    hostname: ${DATACENTER}_zookeeper-2_1
+    restart: ${REINICIAR:-always}
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT:-2181}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ${DATACENTER}_zookeeper-1_1:22888:23888;${DATACENTER}_zookeeper-2_1:32888:33888;${DATACENTER}_zookeeper-3_1:42888:43888
+#      ZOOKEEPER_SERVER_1: zookeeper-1:${ZOOKEEPER_INTERNAL_PORT_1:-22888}:${ZOOKEEPER_ELECTION_PORT_1:-23888}
+#      ZOOKEEPER_SERVER_2: zookeeper-2:${ZOOKEEPER_INTERNAL_PORT_2:-32888}:${ZOOKEEPER_ELECTION_PORT_2:-33888}
+#      ZOOKEEPER_SERVER_3: zookeeper-3:${ZOOKEEPER_INTERNAL_PORT_3:-42888}:${ZOOKEEPER_ELECTION_PORT_3:-43888}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_zookeeper-3_1
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT:-2181}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ${DATACENTER}_zookeeper-1_1:22888:23888;${DATACENTER}_zookeeper-2_1:32888:33888;${DATACENTER}_zookeeper-3_1:42888:43888
+#      ZOOKEEPER_SERVER_1: zookeeper-1:${ZOOKEEPER_INTERNAL_PORT_1:-22888}:${ZOOKEEPER_ELECTION_PORT_1:-23888}
+#      ZOOKEEPER_SERVER_2: zookeeper-2:${ZOOKEEPER_INTERNAL_PORT_2:-32888}:${ZOOKEEPER_ELECTION_PORT_2:-33888}
+#      ZOOKEEPER_SERVER_3: zookeeper-3:${ZOOKEEPER_INTERNAL_PORT_3:-42888}:${ZOOKEEPER_ELECTION_PORT_3:-43888}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafka-1:
+    image: confluentinc/cp-kafka:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-1_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafka-2:
+    image: confluentinc/cp-kafka:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-2_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafka-3:
+    image: confluentinc/cp-kafka:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-3_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DATACENTER}_kafka-3_1:${BROKER_PORT:-9092}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+
+  schema-registry-1:
+    image: confluentinc/cp-schema-registry:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_schema-registry-1_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: ${DATACENTER}_schema-registry-1_1
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+
+  schema-registry-2:
+    image: confluentinc/cp-schema-registry:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_schema-registry-2_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: ${DATACENTER}_schema-registry-2_1
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+
+  schema-registry-3:
+    image: confluentinc/cp-schema-registry:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_schema-registry-3_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: ${DATACENTER}_schema-registry-3
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+
+  kafka-connect-1:
+    image: confluentinc/cp-kafka-connect:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-connect-1_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-3_1:${BROKER_PORT:-9092}
+      CONNECT_REST_ADVERTISED_HOST_NAME: ${DATACENTER}_kafka-connect-1_1
+      CONNECT_REST_PORT: ${CONNECT_PORT:-8083}
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-1_1:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-1_1:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+
+  kafka-connect-2:
+    image: confluentinc/cp-kafka-connect:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-connect-2_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},kafka-3_1:${BROKER_PORT:-9092}
+      CONNECT_REST_ADVERTISED_HOST_NAME: ${DATACENTER}_kafka-connect-2_1
+      CONNECT_REST_PORT: ${CONNECT_PORT:-8083}
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-2_1:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-2_1:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+
+  kafka-connect-3:
+    image: confluentinc/cp-kafka-connect:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-connect-3_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-3_1:${BROKER_PORT:-9092}
+      CONNECT_REST_ADVERTISED_HOST_NAME: ${DATACENTER}_kafka-connect-3_1
+      CONNECT_REST_PORT: ${CONNECT_PORT:-8083}
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-3_1:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://${DATACENTER}_schema-registry-3_1:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+
+  kafka-rest-1:
+    image: confluentinc/cp-kafka-rest:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-rest-1_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_REST_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},kafka-3_1:${BROKER_PORT:-9092}
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://${DATACENTER}_schema-registry-1_1:8081,http://${DATACENTER}_schema-registry-2_1:8081,http://${DATACENTER}_schema-registry-3_1:8081
+      KAFKA_REST_HOST_NAME: ${DATACENTER}_kafka-rest-1_1
+    ports:
+      - ${REST_BINDING_PORT_1:-1882}:${REST_PORT:-8082}
+
+  kafka-rest-2:
+    image: confluentinc/cp-kafka-rest:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-rest-2_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_REST_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},kafka-3_1:${BROKER_PORT:-9092}
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://${DATACENTER}_schema-registry-1_1:8081,http://${DATACENTER}_schema-registry-2_1:8081,http://${DATACENTER}_schema-registry-3_1:8081
+      KAFKA_REST_HOST_NAME: ${DATACENTER}_kafka-rest-2_1
+    ports:
+      - ${REST_BINDING_PORT_2:-1883}:${REST_PORT:-8082}
+
+  kafka-rest-3:
+    image: confluentinc/cp-kafka-rest:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-rest-3_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_REST_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},kafka-3_1:${BROKER_PORT:-9092}
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://${DATACENTER}_schema-registry-1_1:8081,http://${DATACENTER}_schema-registry-2_1:8081,http://${DATACENTER}_schema-registry-3_1:8081
+      KAFKA_REST_HOST_NAME: ${DATACENTER}_kafka-rest-3_1
+    ports:
+      - ${REST_BINDING_PORT_3:-1884}:${REST_PORT:-8082}

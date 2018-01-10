@@ -1,0 +1,85 @@
+---
+version: '3.3'
+networks:
+  default:
+    external:
+      name: ${RED:-confluent-network}
+services:
+  schema-registry-1:
+    image: confluentinc/cp-schema-registry:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_schema-registry-1_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: ${DATACENTER}_schema-registry-1_1
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+    ports:
+      - ${REGISTRY_BINDING_PORT_1:-1771}:${REGISTRY_PORT:-8081}
+
+  schema-registry-2:
+    image: confluentinc/cp-schema-registry:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_schema-registry-2_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: ${DATACENTER}_schema-registry-2_1
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+    ports:
+      - ${REGISTRY_BINDING_PORT_2:-1772}:${REGISTRY_PORT:-8081}
+
+  schema-registry-3:
+    image: confluentinc/cp-schema-registry:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_schema-registry-3_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: ${DATACENTER}_schema-registry-3
+      # kafkastore.connection.url should be identical across all schema registry nodes. By
+      # sharing this setting, all Schema Registry instances will point to the same ZooKeeper
+      # cluster in DC A
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      # The Schema Registry instances in DC A have master.eligibility set to true, meaning that all can be elected master.
+      SCHEMA_REGISTRY_MASTER_ELIGIBILITY: 'true'
+      # schema.registry.zk.namespace Namespace under which schema registry related metadata is
+      # stored in Zookeeper. This setting should be identical across all nodes in the same schema
+      # registry.
+      # SCHEMA_REGISTRY_ZK_NAMESPACE: nombrespacio
+    ports:
+      - ${REGISTRY_BINDING_PORT_3:-1773}:${REGISTRY_PORT:-8081}
+

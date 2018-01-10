@@ -1,0 +1,103 @@
+---
+version: '3.3'
+networks:
+  default:
+    external:
+      name: ${RED:-confluent-network}
+services:
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_zookeeper-1_1
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT:-2181}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ${DATACENTER}_zookeeper-1_1:22888:23888;${DATACENTER}_zookeeper-2_1:32888:33888;${DATACENTER}_zookeeper-3_1:42888:43888
+#      ZOOKEEPER_SERVER_1: zookeeper-1:${ZOOKEEPER_INTERNAL_PORT_1:-22888}:${ZOOKEEPER_ELECTION_PORT_1:-23888}
+#      ZOOKEEPER_SERVER_2: zookeeper-2:${ZOOKEEPER_INTERNAL_PORT_2:-32888}:${ZOOKEEPER_ELECTION_PORT_2:-33888}
+#      ZOOKEEPER_SERVER_3: zookeeper-3:${ZOOKEEPER_INTERNAL_PORT_3:-42888}:${ZOOKEEPER_ELECTION_PORT_3:-43888}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:${CP_VERSION:-latest}
+    hostname: ${DATACENTER}_zookeeper-2_1
+    restart: ${REINICIAR:-always}
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT:-2181}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ${DATACENTER}_zookeeper-1_1:22888:23888;${DATACENTER}_zookeeper-2_1:32888:33888;${DATACENTER}_zookeeper-3_1:42888:43888
+#      ZOOKEEPER_SERVER_1: zookeeper-1:${ZOOKEEPER_INTERNAL_PORT_1:-22888}:${ZOOKEEPER_ELECTION_PORT_1:-23888}
+#      ZOOKEEPER_SERVER_2: zookeeper-2:${ZOOKEEPER_INTERNAL_PORT_2:-32888}:${ZOOKEEPER_ELECTION_PORT_2:-33888}
+#      ZOOKEEPER_SERVER_3: zookeeper-3:${ZOOKEEPER_INTERNAL_PORT_3:-42888}:${ZOOKEEPER_ELECTION_PORT_3:-43888}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_zookeeper-3_1
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT:-2181}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ${DATACENTER}_zookeeper-1_1:22888:23888;${DATACENTER}_zookeeper-2_1:32888:33888;${DATACENTER}_zookeeper-3_1:42888:43888
+#      ZOOKEEPER_SERVER_1: zookeeper-1:${ZOOKEEPER_INTERNAL_PORT_1:-22888}:${ZOOKEEPER_ELECTION_PORT_1:-23888}
+#      ZOOKEEPER_SERVER_2: zookeeper-2:${ZOOKEEPER_INTERNAL_PORT_2:-32888}:${ZOOKEEPER_ELECTION_PORT_2:-33888}
+#      ZOOKEEPER_SERVER_3: zookeeper-3:${ZOOKEEPER_INTERNAL_PORT_3:-42888}:${ZOOKEEPER_ELECTION_PORT_3:-43888}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafka-1:
+    image: confluentinc/cp-kafka:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-1_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafka-2:
+    image: confluentinc/cp-kafka:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-2_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092}
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  kafka-3:
+    image: confluentinc/cp-kafka:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-3_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${DATACENTER}_kafka-3_1:${BROKER_PORT:-9092}
+    extra_hosts:
+      - "moby:127.0.0.1"
+

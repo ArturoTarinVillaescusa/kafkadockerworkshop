@@ -1,0 +1,3 @@
+Label,# Samples,Average,Min,Max,90% Line,Std. Dev.,Error %,Throughput,Received KB/sec,Avg. Bytes
+productor PUERTO 1882,7000,75,1,1513,89,233.06,0.00%,1.9,0.50,275.0
+TOTAL,7000,75,1,1513,89,233.06,0.00%,1.9,0.50,275.0

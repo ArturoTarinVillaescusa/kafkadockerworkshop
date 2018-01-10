@@ -1,0 +1,3 @@
+Label,# Samples,Average,Min,Max,90% Line,Std. Dev.,Error %,Throughput,Received KB/sec,Avg. Bytes
+OS Process Sampler,453,4644,38,18681,5167,1442.85,0.00%,.2,0.81,4982.1
+TOTAL,453,4644,38,18681,5167,1442.85,0.00%,.2,0.81,4982.1

@@ -1,0 +1,85 @@
+---
+version: '3.3'
+networks:
+  default:
+    external:
+      name: ${RED:-confluent-network}
+services:
+  db2:
+    image: ibmcom/db2express-c:latest
+    restart: ${REINICIAR:-always}
+    command: db2start
+    ports:
+      - "50000:50000"
+    environment:
+      DB2INST1_PASSWORD: db2inst1-pwd
+      LICENSE: accept
+
+  elasticsearch:
+    image: elasticsearch
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_elasticsearch_1
+
+  kibana:
+    image: kibana
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kibana_1
+    ports:
+       - 5601:5601
+
+  mysql:
+    image: mysql
+    restart: ${REINICIAR:-always}
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+
+  oracle:
+    image: webdizz/oracle-xe-11g-sa:latest
+    ports:
+      - "15080:8080"
+      - "1521:1521"
+    environment:
+      - processes=200
+      - DATABASES=sample
+    volumes:
+      - .oracle_data:/u01/app/oracle
+
+  edgenode:
+    image: tomcat:8.0
+
+#  traefik:
+#    image: traefik
+#    restart: ${REINICIAR:-always}
+#    ports:
+#      -p "80:80"
+#      -p "8080:8080"
+#    volumes:
+#      -v /var/run/docker.sock:/var/run/docker.sock
+#      -v config/traefik.toml:/etc/traefik/traefik.toml
+
+#  test:
+#    image: emilevauge/whoami
+#    restart: ${REINICIAR:-always}
+#    environment:
+#      - VIRTUAL_HOST=test.docker.local
+
+#  adminer:
+#    image: adminer
+#    restart: ${REINICIAR:-always}
+#    ports:
+#      - "8080:8080"
+#
+#  nginx-proxy:
+#    image: jwilder/nginx-proxy
+#    restart: ${REINICIAR:-always}
+#    ports:
+#      - "80:80"
+#      - "8083:8083"
+#    volumes:
+#      - /var/run/docker.sock:/tmp/docker.sock:ro
+#
+#  whoami:
+#    image: jwilder/whoami
+#    restart: ${REINICIAR:-always}
+#    environment:
+#      - VIRTUAL_HOST=whoami.local

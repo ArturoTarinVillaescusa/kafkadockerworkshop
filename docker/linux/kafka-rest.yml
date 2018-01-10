@@ -1,0 +1,72 @@
+---
+version: '3.3'
+networks:
+  default:
+    external:
+      name: ${RED:-confluent-network}
+services:
+  kafka-rest-1:
+    image: confluentinc/cp-kafka-rest:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-rest-1_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_REST_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},kafka-3_1:${BROKER_PORT:-9092}
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://${DATACENTER}_schema-registry-1_1:8081,http://${DATACENTER}_schema-registry-2_1:8081,http://${DATACENTER}_schema-registry-3_1:8081
+      KAFKA_REST_HOST_NAME: ${DATACENTER}_kafka-rest-1_1
+    ports:
+      - ${REST_BINDING_PORT_1:-1882}:${REST_PORT:-8082}
+
+  kafka-rest-2:
+    image: confluentinc/cp-kafka-rest:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-rest-2_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_REST_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},kafka-3_1:${BROKER_PORT:-9092}
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://${DATACENTER}_schema-registry-1_1:8081,http://${DATACENTER}_schema-registry-2_1:8081,http://${DATACENTER}_schema-registry-3_1:8081
+      KAFKA_REST_HOST_NAME: ${DATACENTER}_kafka-rest-2_1
+    ports:
+      - ${REST_BINDING_PORT_2:-1883}:${REST_PORT:-8082}
+
+  kafka-rest-3:
+    image: confluentinc/cp-kafka-rest:${CP_VERSION:-latest}
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_kafka-rest-3_1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry-1
+      - schema-registry-2
+      - schema-registry-3
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: ${DATACENTER}_zookeeper-1_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-2_1:${ZOOKEEPER_PORT:-2181},${DATACENTER}_zookeeper-3_1:${ZOOKEEPER_PORT:-2181}
+      KAFKA_REST_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},kafka-3_1:${BROKER_PORT:-9092}
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://${DATACENTER}_schema-registry-1_1:8081,http://${DATACENTER}_schema-registry-2_1:8081,http://${DATACENTER}_schema-registry-3_1:8081
+      KAFKA_REST_HOST_NAME: ${DATACENTER}_kafka-rest-3_1
+    ports:
+      - ${REST_BINDING_PORT_3:-1884}:${REST_PORT:-8082}

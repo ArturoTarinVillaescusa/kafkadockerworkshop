@@ -1,0 +1,38 @@
+---
+version: '3.3'
+networks:
+  default:
+    external:
+      name: ${RED:-confluent-network}
+services:
+  replicator:
+    image: confluentinc/cp-enterprise-replicator:latest
+    # restart: on-failure:3
+    restart: ${REINICIAR:-always}
+    hostname: ${DATACENTER}_replicator
+#    depends_on:
+#      - kafka-1
+#      - kafka-2
+#      - kafka-3
+    environment:
+      # In DC B, run Replicator with Kafka in the “master” datacenter (DC A) as the source
+      # and Kafka in DC B as the target.
+      CONNECT_BOOTSTRAP_SERVERS: ${DATACENTER}_kafka-1_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-2_1:${BROKER_PORT:-9092},${DATACENTER}_kafka-3_1:${BROKER_PORT:-9092}
+      CONNECT_REST_PORT: 28082
+      CONNECT_GROUP_ID: "default"
+      CONNECT_CONFIG_STORAGE_TOPIC: "replicator.config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "replicator.offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "replicator.status"
+      CONNECT_CLEANUP_POLICY: "compact"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "replicator-1"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: DEBUG
+    volumes:
+      - /tmp/replicator-host-cluster-test/:/tmp/test
+    extra_hosts:
+      - "moby:127.0.0.1"
+#    ports:
+#      - ${REPLICATOR_BINDING_PORT:-1772}:${REPLICATOR_PORT:-8083}
