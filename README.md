@@ -34,9 +34,11 @@
 ## 1 Document objective
 
  Following the steps of this workshop will give you a full Kafka cluster lab to run in your laptop.
- This is the architecture that you may expect to have:
+ This is the architecture that you may expect to have built and tested after you have completed them:
 
 ![alt text](imagenes/multi-dc-setup.png "Arquitectura recomendada")
+
+ Let's go for it!
 
 ## 2 Hardware Requirements
 
