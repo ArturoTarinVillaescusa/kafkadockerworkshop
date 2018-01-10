@@ -1,6 +1,6 @@
-# WorkshopVM
+# Kafka Docker Cluster Workshop
 
-# Tabla de contenido
+# Table Of Contents
 1. [Document objective](#1-document-objective)
 2. [Hardware Requirements](#2-hardware-requirements)
 3. [Software Requirements](#3-software-requirements)
