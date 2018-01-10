@@ -95,7 +95,7 @@
         │       ├── inicio.sh
         │       └── parada.sh
         └── scripts
-            ├── chaos_monkey.sh
+            ├── randomly_putdown_machines.sh
             ├── config
             │   ├── consumerdatacenterb.properties
             │   ├── createDB2sampleDB.sh
