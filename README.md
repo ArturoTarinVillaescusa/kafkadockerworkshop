@@ -196,67 +196,76 @@
 
 ### 4-2 Messaging Tests
 
-  Vamos lanzar unas cuantas pruebas de mensajería:
+  Let's launch a few messaging tests:
 
-    - Envío y consumo de mensajes desde un tópico usando los comandos de Kafka
-    - Réplica entre clusters con MirrorMaker
-    - Enterprise Replicator message replication between clusters
-    - JMeter stress tests
+     - Sending and consuming messages from a topic using the Kafka commands
+     - Replica between clusters with MirrorMaker
+     - Enterprise Replicator message replication between clusters
+     - JMeter stress tests
 
 ### 4-2-1 Publish-Subscribe messaging using command line Kafka scripts
 
  Nuestra primera prueba consiste en asegurarnos mediante los scripts que proporciona Kafka, que los tres broker del cluster
  de nuestro laboratorio trabajan realmente en modo cluster.
- 
+
  Para ello vamos a usar:
-   
-   - el comando "kafka-topics" para crear un tópico, 
-   - el comando "kafka-console-producer" para enviar mensajes al tópico desde uno de los broker, 
+
+   - el comando "kafka-topics" para crear un tópico,
+   - el comando "kafka-console-producer" para enviar mensajes al tópico desde uno de los broker,
    - el comando "kafka-console-consumer" para leer los mensajes de ese tópico desde los tres broker.
 
- ***Pasos a seguir si estás usando un entorno Linux, ya sea tu PC, o la máquina virtual "WorkshopVM" )***
+ Our first test is to make sure through the scripts provided by Kafka, that the three brokers in our lab's cluster
+ do really work in cluster mode.
 
-    1) Abrir cuatro terminales
+  For this we will use:
 
-    2) Desde uno de los terminales, crear un tópico para nuestra prueba
+    - the "kafka-topics" command, to create a topic,
+    - the "kafka-console-producer" command, to send messages from one of the brokers to the topic itself,
+    - the "kafka-console-consumer" command, to pull messages from the topic, using any of the three brokers as a source.
+
+ ***We will follow these steps***
+
+    1) Open four Linux terminals
+
+    2) From one of the terminals, create a topic
 
          docker@docker:~$ docker exec -it dc1_kafka-1_1 \
                                     kafka-topics --create \
                                    --zookeeper dc1_zookeeper-1_1:2181,dc1_zookeeper-2_1:2181,dc1_zookeeper-3_1:2181  \
                                    --replication-factor 3 --partitions 2 --topic pruebaencluster
 
-
-       El comando retorna este resultado:
+       Command result will be:
 
          Created topic "pruebaencluster".
 
-    3) Con este comando podemos consultar desde otro nodo del cluster de Kafka la información sobre el tópico que hemos creado:
+    3) Then, check about the topic. In order to test the cluster use a different node from the one that we created the topic.
+       In this example, we are using dc1_kafka-3_1 to create it:
 
          docker@docker:~$ docker exec -it dc1_kafka-3_1 \
              kafka-topics --describe --topic pruebaencluster \
              --zookeeper dc1_zookeeper-1_1:2181,dc1_zookeeper-1_1:2181,dc1_zookeeper-1_1:2181
 
-       El comando retorna este resultado:
+       Command will return this:
 
          Topic:pruebaencluster	PartitionCount:2	ReplicationFactor:3	Configs:
          Topic: pruebaencluster	Partition: 0	Leader: 2	Replicas: 2,1,3	Isr: 2,1,3
          Topic: pruebaencluster	Partition: 1	Leader: 3	Replicas: 3,2,1	Isr: 3,2,1
 
-    4) A continuación abrimos un productor desde un terminal:
+    4) Next, open a producer from a terminal:
 
          docker@docker:~$ docker exec -it dc1_kafka-3_1 \
                      kafka-console-producer \
                     --broker-list dc1_kafka-1_1:9092,dc1_kafka-2_1:9092,dc1_kafka-3_1:9092 \
                     --topic pruebaencluster
 
-       y escribimos unos cuantos mensajes para enviarlos al tópico
+       then write three messages on it, to send them to the topic
 
          mensaje 1
          mensaje 2
          mensaje 3
 
-    5) Por último, abrimos tres terminales, uno por cada broker de Kafka, y consumimos los mensajes que hemos enviado
-    al tópico:
+    5) Finally, use three different terminals, one for each broker in the Kafka cluster, and consume
+       the messages that we have sent to the topic:
 
          docker@docker:~$ docker exec -it dc1_kafka-1_1 \
                                 kafka-console-consumer \
