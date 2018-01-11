@@ -282,63 +282,64 @@
 
 ### 4-2-2 MirrorMaker message replication between clusters
 
- Para llevar a cabo las pruebas de MirrorMaker hemos proporcionado el script mirrormaker.sh, ubicado en la carpeta "scripts"
- del repositorio de Git. Si lo lanzamos sin parámetros podemos ver cómo se usa:
- 
+  To carry out the MirrorMaker tests we have provided the mirrormaker.sh script, located in the "scripts" folder
+  from the Git repository. The script is self-descriptive:
+
       $ ./mirrormaker.sh
     
-       Forma de uso:
+       Use:
 
-       Arrancar MirrorMaker desde una ventana con el comando
+       Start MirrorMaker from a terminal with this parameter
 
        $ ./mirrormaker.sh iniciarmirrormaker
 
-       A continuación, abrir otra ventana y producir mensajes en el tópico "topicmirrormakerdcb" del datacenter principal usando el comando
+       Then, open a new terminal and produce keyed messages in the primary datacenter with this command
 
        $ ./mirrormaker.sh producir SinClave <nummensajes>
-       o
+
+       or use this to produce the messages without key
+
        $ ./mirrormaker.sh producir ConClave <nummensajes>
 
-       Abrir otra ventana más y consumir los mensajes replicados al tópico "topicmirrormakerdcb" del datacenter secundario usando el comando
+       Open a new window and consume from the secondary datacenter the messages that has been replicated by
+       MirrorMaker from the primary with this command:
 
-       $ ./mirrormaker.sh consumir dc1
-       o
        $ ./mirrormaker.sh consumir dc2
  
- ***Verificamos el funcionamiento de MirrorMaker siguiendo estos pasos:***
+ ***We verify the operation of MirrorMaker following these steps:***
 
- 1) Asegurate de tener levantados todos los datacenter con este comando:
+ 1) Make sure to have all the datacenter started using this command:
  
     $ ./LABORATORIO.sh iniciar todoslosdatacenter 
  
- 2) Inicia MirrorMaker lanzando el script "mirrormaker.sh" con el parámetro "iniciarmirrormaker":
+ 2) Next, start MirrorMaker:
 
          docker@docker:~/scripts$ ./mirrormaker.sh iniciarmirrormaker
 
- 2) Iniciar un consumidor de los mensajes que van a ser insertados en el tópico "topicmirrormakerdcb" del dc1 con este comando:
+ 2) Next, start a message consumer from the topic in the primary datacenter's Kafka cluster:
 
          docker@docker:~/scripts$ ./mirrormaker.sh consumir dc1
 
-    La pantalla queda a la espera de que se produzcan mensajes. Comenzará a imprimirlos cuando lancemos el comando en el paso 4)
+    Screen will be waiting for messages to arrive. It will start printing them as soon as we
+    launch the producer command in step 4)
     
- 3) Iniciar un consumidor de los mensajes que van a ser replicados al tópico "topicmirrormakerdcb" del dc2 con este comando:
+ 3) Next, start a message consumer from the topic in the secondary datacenter's Kafka cluster, where MirrorMaker
+    should be replicating the messages as soon as they're inserted in the next step:
 
          docker@docker:~/scripts$ ./mirrormaker.sh consumir dc2
 
-    La pantalla queda a la espera de que se produzcan mensajes. Comenzará a imprimirlos cuando lancemos el comando en el paso 4)
+    Screen will also be still, waiting for messages
 
- 4) Abrir otro terminal y producir mensajes en el tópico "topicmirrormakerdcb" del dc1 con este comando:
-
-    Si queremos que los mensajes producidos no tengan clave, usaremos el parámetro SinClave:
+ 4) Start producing messages from a new terminal. If you want them to be unkeyed use this command:
     
          docker@docker:~/scripts$ ./mirrormaker.sh producir SinClave <nummensajes>
 
-    Si queremos que los mensajes producidos tengan clave, usaremos el parámetro ConClave:
+    If you want them keyed, use that one:
     
          docker@docker:~/scripts$ ./mirrormaker.sh producir ConClave <nummensajes>
 
-    Una vez el script haya insertado los mensajes en el tópico, comenzaremos a verlos en las ventanas de los comandos consumidores
-    que teníamos abiertas en 2) y 3):
+    Once the script has inserted the messages in the topic, we will begin to see them in the previous
+    consumer windows that we opened in steps 2) and 3):
 
          docker@docker:~/scripts$ ./mirrormaker.sh consumir dc1
 
