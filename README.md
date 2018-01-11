@@ -205,15 +205,6 @@
 
 ### 4-2-1 Publish-Subscribe messaging using command line Kafka scripts
 
- Nuestra primera prueba consiste en asegurarnos mediante los scripts que proporciona Kafka, que los tres broker del cluster
- de nuestro laboratorio trabajan realmente en modo cluster.
-
- Para ello vamos a usar:
-
-   - el comando "kafka-topics" para crear un tópico,
-   - el comando "kafka-console-producer" para enviar mensajes al tópico desde uno de los broker,
-   - el comando "kafka-console-consumer" para leer los mensajes de ese tópico desde los tres broker.
-
  Our first test is to make sure through the scripts provided by Kafka, that the three brokers in our lab's cluster
  do really work in cluster mode.
 
@@ -282,25 +273,12 @@
                                 --bootstrap-server dc1_kafka-1_1:9092,dc1_kafka-2_1:9092,dc1_kafka-3_1:9092 \
                                 --topic pruebaencluster --from-beginning
 
-    Los tres consumidores retornan este resultado:
+    All the three consumer windows will return the three messages that we inserted earlier in the topic:
 
         mensaje 2
         mensaje 1
         mensaje 3
         Processed a total of 3 messages
-
- ***Pasos a seguir si tienes el laboratorio en Windows con Docker Quickstart. Esta opción NO aplica si usas la máquina virtual "WorkshopVM"***
-
- Para hacer esta prueba en entornos Windows basta con modificar la lista
- de pasos de Linux, añadiendo estas particularidades:
-
-   - Abrir Powershell en lugar del terminal
-
-   - Cargar las variables de entorno con el comando
-
-        eval $(docker-machine.exe env DCAYDCB)
-
-   - Al invocar los comandos listados, nos referiremos a los contenedores con el prefijo "windows_" en lugar de "linux_"
 
 ### 4-2-2 MirrorMaker message replication between clusters
 
