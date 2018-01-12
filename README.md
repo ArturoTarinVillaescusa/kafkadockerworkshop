@@ -371,9 +371,11 @@
 
 ### 4-2-3 Enterprise Replicator message replication between clusters
 
- Para llevar a cabo las pruebas de Enterprise Replicator hemos proporcionado el script enterprisereplicator.sh,
- ubicado en la carpeta "scripts" del repositorio de Git. Si lo lanzamos sin parámetros podemos ver cómo se usa:
- 
+ To carry out the Enterprise Replicator tests we have provided with the enterprisereplicator.sh script,
+ located in the "scripts" folder of the Git repository.
+
+ Launching it without parameters is self-descriptive:
+
         $ ./enterprisereplicator.sh***
 
          Forma de uso:
@@ -384,38 +386,38 @@
          $ ./enterprisereplicator.sh consumir dc1
          $ ./enterprisereplicator.sh consumir dc2
 
- ***Verificamos el funcionamiento de Enterprise Replicator siguiendo estos pasos:***
+ ***Testing steps for Enterprise Replicator:***
 
- 1) Asegurate de tener levantados todos los datacenter con este comando:
+ 1) Make sure all the datacenters are up and running:
  
         docker@docker:~/scripts$ ./LABORATORIO.sh iniciar todoslosdatacenter 
 
- 2) Iniciar un consumidor de los mensajes que van a ser insertados en el tópico "topicoreplicador" del dc1 con este comando:
+ 2) Run a consumer in the main datacenter:
 
          docker@docker:~/scripts$ ./enterprisereplicator.sh consumir dc1
 
-    La pantalla queda a la espera de que se produzcan mensajes. Comenzará a imprimirlos cuando lancemos el comando en el paso 4)
+    This will be in standby, waiting to receive messages. We will create them in step 4)
 
- 3) Iniciar un consumidor de los mensajes que van a ser insertados en el tópico "topicoreplicador" del dc2 con este comando:
+ 3) Run a consumer in the secondary datacenter:
 
          docker@docker:~/scripts$ ./enterprisereplicator.sh consumir dc2
 
-    La pantalla queda a la espera de que se produzcan mensajes. Comenzará a imprimirlos cuando lancemos el comando en el paso 4)
+    This will also be in standby, waitiing to receive the messages that Enterprise Replicator
+    will be transfering from topic in the main datacenter Kafka cluster to the secondary
+    datacenter Kafka cluster
 
 
- 4) Lanzar el script "enterprisereplicator.sh" con los parámetros "producir", "SinClave" o "ConClave" en función de si queremos
- que los mensajes se generen con clave o no, y un número.
- 
- Creará un conector de Enerprise Replicator llamado "conector-replicador", y un tópico llamado "topicoreplicador", y a continuación
- insertará en el tópico el número de mensajes indicados en el parámetro correspondiente:
+ 4) Launch the "enterprisereplicator.sh" script with the parameters "producir", "SinClave" or "ConClave"
+    depending on whether you want the messages to be generated keyed or un-keyed, and a number of messages.
+
 
          docker@docker:~/scripts$ ./enterprisereplicator.sh producir SinClave <nummensajes>
- ó 
+   or
          docker@docker:~/scripts$ ./enterprisereplicator.sh producir SinClave <nummensajes>
  
  
- Una vez el script haya insertado los mensajes en el tópico, comenzaremos a verlos en las ventanas de los comandos consumidores
- que teníamos abiertas en 2) y 3):
+  Once the script starts inserting the messages in the main datacenter Kafka cluster's topic, we will
+  see them in the windows of the consumer commands that we opened in steps 2) and 3):
 
          docker@docker:~/scripts$ ./enterprisereplicator.sh consumir dc1
 
@@ -443,31 +445,30 @@
 
 ### 4-2-4 JMeter stress tests
 
- Un requisito indispensable para realizar estas pruebas es necesario tener instalado y configurado JMeter en la máquina que
- vaya a usarse como cliente de pruebas. Para hacerlo hay que seguir estas páginas:
+  An essential requirement to perform these tests is to have JMeter installed and configured
+  on the machine that is going to be used as a test client. To do so, follow these pages:
 
  [Instalar JMeter](https://jmeter.apache.org/)
 
  [Instalar los plugins de JMeter](https://jmeter-plugins.org/)
 
- Los plugin se descargan desde esta ubicación:
+ Plugins can be downloaded from:
  
  https://jmeter-plugins.org/downloads/file/JMeterPlugins-Standard-1.4.0.zip
  https://jmeter-plugins.org/downloads/file/JMeterPlugins-ExtrasLibs-1.4.0.zip
 
 
- Nuestros JMeter debe tener instalados estos plugin para poder llevar acabo nuestros ejercicios:
+ Our JMeter must have installed these plugins in order to carry out our exercises:
 
  ![alt text](imagenes/jmeterplugins.png "Plugins de JMeter que tenemos que instalar")
 
- Una vez instalado JMeter y configurados los plugin, arrancaremos el entorno. Sólo necesitamos dc1 y db2, por lo que
- usaremos este comando.
- 
+ Once JMeter is installed and the plugins are configured, we will start the environment.
+ We only need dc1 and db2, so we will use this command.
+
         docker@docker:~/scripts$ ./LABORATORIO.sh iniciar dc1 db2
  
- Para lanzar el test usaremos el script testJmeter.sh ubicado en la carpeta "scripts" del repositorio de Git. Si lo lanzamos
- sin usar parámetros podemos ver cómo se usa:
-
+ To launch the test we will use the testJmeter.sh script located in the "scripts" folder.
+ If we throw it without using parameters we can see the script help:
        $ ./testJmeter.sh***
 
         Lanzador de tests de JMeter
@@ -509,15 +510,17 @@
 
 #### 4-2-4-1 LINEA BASE PRODUCTOR ONLINE
 
- Este test lanzará 100 thread concurrentes, cada uno de ellos envía 1 mensaje por segundo. La duración del test
- será de 30 minutos. Con esta configuración, este test va a enviar 6.000 mensajes por minuto.
+  This test will launch 100 concurrent thread, each of them sends 1 message per second.
 
- Se inicia con este comando:
- 
+  The duration of the test will be 30 minutes. With this configuration, this test will
+  send 6,000 messages per minute.
+
+  It starts with this command:
+
         docker@docker:~/scripts$ ./testJmeter.sh LINEA_BASE_PRODUCTOR_ONLINE
 
- Estas son las métricas de la línea base productor online en mi máquina:
- 
+  These are the metrics of the online producer base line on my machine:
+
  ***ActiveThreadsOverTime*** 
 
  ![alt text](imagenes/LINEA_BASE_PRODUCTOR_ONLINE/ActiveThreadsOverTime.png "ActiveThreadsOverTime")
@@ -556,13 +559,13 @@
  
 #### 4-2-4-2 LINEA BASE PRODUCTOR BULK ONLINE
              
- Este test lanzará 1 thread envia de una vez 100 mensajes por segundo, durante 30 minutos.
+  This test will send 1 thread, sending 100 messages per second, for 30 minutes at a time.
 
- Se inicia con este comando:
- 
+  It starts with this command:
+
         docker@docker:~/scripts$ ./testJmeter.sh LINEA_BASE_PRODUCTOR_ONLINE
 
- Estas son las métricas de la línea base productor bulk online en mi máquina:
+  These are the metrics of the bulk online producer base line on my machine:
  
  ***ActiveThreadsOverTime*** 
 
@@ -602,15 +605,15 @@
 
 #### 4-2-4-3 LINEA BASE PRODUCTOR BULK CONNECT
 
- Este test lanzará 1 thread por segundo que llamará a un procedure de DB2 que escribirá 100 registros en la
- base de datos de pruebas
+  This test will launch 1 thread per second that will call a DB2 procedure that will write 100 records in the
+  test database
 
- Se inicia con este comando:
- 
+  It starts with this command:
+
         docker@docker:~/scripts$ ./testJmeter.sh LINEA_BASE_PRODUCTOR_BULK_CONNECT
 
- Estas son las métricas de la línea base productor bulk connect en mi máquina:
- 
+  These are the metrics of the bulk connect producer base line on my machine:
+
  ***ActiveThreadsOverTime*** 
 
  ![alt text](imagenes/LINEA_BASE_PRODUCTOR_BULK_CONNECT/ActiveThreadsOverTime.png "ActiveThreadsOverTime")
@@ -649,15 +652,15 @@
  
 #### 4-2-4-4 LINEA BASE CONSUMIDOR ONLINE
 
- Este test lanzará 1 thread por segundo para leer los mensajes que hayan sido escritos en el tópico. El test
- durará 30 minutos.
+  This test will launch 1 thread per second to read the messages that have been written on the topic. The test
+  will last 30 minutes.
 
- Se inicia con este comando:
- 
+  It starts with this command:
+
         docker@docker:~/scripts$ ./testJmeter.sh LINEA_BASE_CONSUMIDOR_ONLINE
 
- Estas son las métricas de la línea base consumidor online en mi máquina:
- 
+ These are the metrics of the consumerer base line on my machine:
+
  ***ActiveThreadsOverTime*** 
 
  ![alt text](imagenes/LINEA_BASE_CONSUMIDOR_ONLINE/ActiveThreadsOverTime.png "ActiveThreadsOverTime")
@@ -696,15 +699,15 @@
 
 #### 4-2-4-5 PRODUCTOR PICOS
 
- Este test inyectará cada 5 minutos 500 threads concurrentes, cada thread escribirá un mensaje. La duración del
- test será de 30 minutos
+  This test will inject 500 concurrent threads every 5 minutes, each thread will write a message.
+  The duration of the test will be 30 minutes
 
- Se inicia con este comando:
+  It starts with this command:
  
         docker@docker:~/scripts$ ./testJmeter.sh PRODUCTOR_PICOS
 
- Estas son las métricas de productor picos en mi máquina:
- 
+ These are the producer metric peaks on my machine:
+
  ***ActiveThreadsOverTime*** 
 
  ![alt text](imagenes/PRODUCTOR_PICOS/ActiveThreadsOverTime.png "ActiveThreadsOverTime")
@@ -743,14 +746,14 @@
 
 #### 4-2-4-6 PRODUCTOR INCREMENTAL
 
- Este test comienza con con 10 threads y cada minuto lanza 10 nuevos threads que se suman a los anteriores
+  This test starts with 10 threads and every minute releases 10 new threads that add to the previous ones
 
- Se inicia con este comando:
- 
+  It starts with this command:
+
         docker@docker:~/scripts$ ./testJmeter.sh PRODUCTOR_INCREMENTAL
 
- Estas son las métricas de productor incremental en mi máquina:
- 
+  These are the incremental producer metrics on my machine:
+
  ***ActiveThreadsOverTime*** 
 
  ![alt text](imagenes/PRODUCTOR_INCREMENTAL/ActiveThreadsOverTime.png "ActiveThreadsOverTime")
