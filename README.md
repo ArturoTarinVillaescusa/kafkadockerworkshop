@@ -6,29 +6,29 @@
 3. [Software Requirements](#3-software-requirements)
 4. [Exercises](#4-exercises)
 
-4.1. [Starting and Stopping your laboratory](##4-1-starting-and-stopping-your-laboratory)
+4.1. [Starting and Stopping your laboratory](#4-1-starting-and-stopping-your-laboratory)
 
 4.2. [Messaging Tests](##4-2-messaging-tests)
 
-4.2.1. [Publish-Subscribe messaging using command line Kafka scripts](###4-2-1-publish-subscribe-messaging-using-command-line-kafka-scripts)
+4.2.1. [Publish-Subscribe messaging using command line Kafka scripts](#4-2-1-publish-subscribe-messaging-using-command-line-kafka-scripts)
 
-4.2.2. [MirrorMaker message replication between clusters](###4-2-2-mirrormaker-replication-between-clusters)
+4.2.2. [MirrorMaker message replication between clusters](#4-2-2-mirrormaker-replication-between-clusters)
 
-4.2.3. [Enterprise Replicator message replication between clusters](###4-2-3-enterprise-replicator-replication-between-clusters)
+4.2.3. [Enterprise Replicator message replication between clusters](#4-2-3-enterprise-replicator-replication-between-clusters)
 
-4.2.4. [JMeter stress tests](###4-2-4-jmeter-stress-tests)
+4.2.4. [JMeter stress tests](#4-2-4-jmeter-stress-tests)
 
-4.2.4.1. [BASE LINE_PRODUCER ONLINE](####4-2-4-1-linea-base-productor-online)
+4.2.4.1. [BASE LINE_PRODUCER ONLINE](#4-2-4-1-linea-base-productor-online)
 
-4.2.4.2. [BASE_LINE_PRODUCER_BULK_ONLINE](####4-2-4-2-linea-base-productor-bulk-online)
+4.2.4.2. [BASE_LINE_PRODUCER_BULK_ONLINE](#4-2-4-2-linea-base-productor-bulk-online)
              
-4.2.4.3. [BASE_LINE_PRODUCER_BULK_CONNECT](####4-2-4-3-linea-base-productor-bulk-connect)
+4.2.4.3. [BASE_LINE_PRODUCER_BULK_CONNECT](#4-2-4-3-linea-base-productor-bulk-connect)
 
-4.2.4.4. [BASE_LINE_CONSUMER_ONLINE](####4-2-4-4-linea-base-consumidor-online)
+4.2.4.4. [BASE_LINE_CONSUMER_ONLINE](#4-2-4-4-linea-base-consumidor-online)
 
-4.2.4.5. [PRODUCER_PEAKS](####4-2-4-5-productor-picos)
+4.2.4.5. [PRODUCER_PEAKS](#4-2-4-5-productor-picos)
 
-4.2.4.6. [PRODUCER_INCREMENTAL_RAMP_UP](####4-2-4-6-productor-incremental)
+4.2.4.6. [PRODUCER_INCREMENTAL_RAMP_UP](#4-2-4-6-productor-incremental)
 
 
 ## 1 Document objective
@@ -100,7 +100,7 @@
             └── testJmeter.sh
 
 
-### 4-1 Starting and Stopping your laboratory
+## 4-1 Starting and Stopping your laboratory
 
   You'll find the "scripts" folder, and there the LABORATORIO.sh script. This uses a config
   file called LABORATORIO.conf. This will help you to tweak your lab, adding or removing racks,
@@ -194,7 +194,7 @@
 
      $ ./LABORATORIO.sh borrar
 
-### 4-2 Messaging Tests
+## 4-2 Messaging Tests
 
   Let's launch a few messaging tests:
 
@@ -203,7 +203,7 @@
      - Enterprise Replicator message replication between clusters
      - JMeter stress tests
 
-### 4-2-1 Publish-Subscribe messaging using command line Kafka scripts
+## 4-2-1 Publish-Subscribe messaging using command line Kafka scripts
 
  Our first test is to make sure through the scripts provided by Kafka, that the three brokers in our lab's cluster
  do really work in cluster mode.
@@ -280,7 +280,7 @@
         mensaje 3
         Processed a total of 3 messages
 
-### 4-2-2 MirrorMaker message replication between clusters
+## 4-2-2 MirrorMaker message replication between clusters
 
   To carry out the MirrorMaker tests we have provided the mirrormaker.sh script, located in the "scripts" folder
   from the Git repository. The script is self-descriptive:
@@ -369,7 +369,7 @@
             ^CProcessed a total of 10000 messages
 
 
-### 4-2-3 Enterprise Replicator message replication between clusters
+## 4-2-3 Enterprise Replicator message replication between clusters
 
  To carry out the Enterprise Replicator tests we have provided with the enterprisereplicator.sh script,
  located in the "scripts" folder of the Git repository.
@@ -443,7 +443,7 @@
             ^CProcessed a total of 6667 messages
 
 
-### 4-2-4 JMeter stress tests
+## 4-2-4 JMeter stress tests
 
   An essential requirement to perform these tests is to have JMeter installed and configured
   on the machine that is going to be used as a test client. To do so, follow these pages:
@@ -508,7 +508,7 @@
 
         Este test comienza con con 10 threads y cada minuto lanza 10 nuevos threads que se suman a los anteriores
 
-#### 4-2-4-1 LINEA BASE PRODUCTOR ONLINE
+## 4-2-4-1 LINEA BASE PRODUCTOR ONLINE
 
   This test will launch 100 concurrent thread, each of them sends 1 message per second.
 
@@ -557,7 +557,7 @@
 
  ![alt text](imagenes/LINEA_BASE_PRODUCTOR_ONLINE/TransactionsPerSecond.png "TransactionsPerSecond")
  
-#### 4-2-4-2 LINEA BASE PRODUCTOR BULK ONLINE
+## 4-2-4-2 LINEA BASE PRODUCTOR BULK ONLINE
              
   This test will send 1 thread, sending 100 messages per second, for 30 minutes at a time.
 
@@ -603,7 +603,7 @@
 
  ![alt text](imagenes/LINEA_BASE_PRODUCTOR_BULK_ONLINE/TransactionsPerSecond.png "TransactionsPerSecond")
 
-#### 4-2-4-3 LINEA BASE PRODUCTOR BULK CONNECT
+## 4-2-4-3 LINEA BASE PRODUCTOR BULK CONNECT
 
   This test will launch 1 thread per second that will call a DB2 procedure that will write 100 records in the
   test database
@@ -650,7 +650,7 @@
 
  ![alt text](imagenes/LINEA_BASE_PRODUCTOR_BULK_CONNECT/TransactionsPerSecond.png "TransactionsPerSecond")
  
-#### 4-2-4-4 LINEA BASE CONSUMIDOR ONLINE
+## 4-2-4-4 LINEA BASE CONSUMIDOR ONLINE
 
   This test will launch 1 thread per second to read the messages that have been written on the topic. The test
   will last 30 minutes.
@@ -697,7 +697,7 @@
 
  ![alt text](imagenes/LINEA_BASE_CONSUMIDOR_ONLINE/TransactionsPerSecond.png "TransactionsPerSecond")
 
-#### 4-2-4-5 PRODUCTOR PICOS
+## 4-2-4-5 PRODUCTOR PICOS
 
   This test will inject 500 concurrent threads every 5 minutes, each thread will write a message.
   The duration of the test will be 30 minutes
@@ -744,7 +744,7 @@
 
  ![alt text](imagenes/PRODUCTOR_PICOS/TransactionsPerSecond.png "TransactionsPerSecond")
 
-#### 4-2-4-6 PRODUCTOR INCREMENTAL
+## 4-2-4-6 PRODUCTOR INCREMENTAL
 
   This test starts with 10 threads and every minute releases 10 new threads that add to the previous ones
 
