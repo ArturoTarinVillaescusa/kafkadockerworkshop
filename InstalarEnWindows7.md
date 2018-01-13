@@ -1,40 +1,42 @@
-# Pasos para preparar el laboratorio en un PC con Windows 7, instalando el software necesario
+# Steps to prepare the laboratory on a Windows 7 laptop
 
- En este apartado cubrimos únicamente la instalación de Docker Quickstart Tools en Windows 7. Para Windows 8 en adelante
- se recomienda usar la instalación de Docker For Windows en lugar de Docker QuickStart Tools.
+ In this section we cover only the installation of Docker Quickstart Tools in Windows 7.
 
- - Instalar Git en nuestro pc siguiendo la [guía de instalación](https://git-scm.com/), y configurar la herramienta con las
- credenciales proporcionadas por el equipo de arquitectura.
+ For Windows 8 versions and up we recommend using Docker For Windows installation instead
+ of Docker QuickStart Tools.
 
- - [instalar VirtualBox](http://www.virtualbox.org/) en un portátil con Windows:
+ - Install Git on your pc following the [installation guide](https://git-scm.com/)
 
-    1) [Descargar el instalador](http://download.virtualbox.org/virtualbox/5.2.0/VirtualBox-5.2.0-118431-Win.exe),
-    arrancarlo y seguir los pasos que indica
+ - [Install VirtualBox](http://www.virtualbox.org/):
 
-    2) Descargar el [extension pack](http://download.virtualbox.org/virtualbox/5.2.0/Oracle_VM_VirtualBox_Extension_Pack-5.2.0-118431.vbox-extpack)
-    y abrirlo con VirtualBox
+    1) [Download the installer](http://download.virtualbox.org/virtualbox/5.2.0/VirtualBox-5.2.0-118431-Win.exe),
+       start it up and follow the steps.
 
-    3) Si tenemos Windows 8 o Windows 10, hemos de desactivar Hiper-V:
+    2) Download VirtualBox [extension pack](http://download.virtualbox.org/virtualbox/5.2.0/Oracle_VM_VirtualBox_Extension_Pack-5.2.0-118431.vbox-extpack)
+       and open it with VirtualBox
 
-    ![alt text](imagenes/desactivar-hiper-v.png "Desactivar Hiper-V")
+    3) If your operating system is Windows 8 o Windows 10 and you've decided to use Docker QuickStart
+       instead of Docker for Windows then you will need to disable Hiper-V to prevent collisions:
 
- - instalar Docker para Windows:
+    ![alt text](imagenes/desactivar-hiper-v.png "Disable Hiper-V")
 
-    1) [Instalar Docker Toolbox](https://download.docker.com/win/stable/DockerToolbox.exe)
+ - Install Docker ToolBox:
+
+    1) [Installl Docker Toolbox](https://download.docker.com/win/stable/DockerToolbox.exe)
 
     ![alt text](imagenes/instalar-docker-toolbox.png "Instalar docker toolbox")
 
- - Una vez instalada la infraestructura necesaria, procedemos a crear una máquina virtual de VirtualBox siguiendo estos pasos:
+ - Once our software is ready, we proceed creating a VirtualBox machine:
 
-    1) Lanzamos Docker Quickstart:
+    1) Launch Docker Quickstart:
 
-    ![alt text](imagenes/docker-quickstart.png "Lanzar Docker Quickstart")
+    ![alt text](imagenes/docker-quickstart.png "Launch Docker Quickstart")
 
-    2) Desde la ventana de Docker Quickstart, recreamos la máquina default:
+    2) From Docker Quickstart, replace "default" machine by our own one:
 
-    ![alt text](imagenes/recrear-docker-default.png "Borrar docker default")
+    ![alt text](imagenes/recrear-docker-default.png "Delete default machine")
 
-    A continuación creamos una máquina para nuestro laboratorio de Kafka:
+    Once deleted, create our own virtual machine:
 
         $ docker-machine create --driver virtualbox --virtualbox-memory 8000 DCAYDCB
         Running pre-create checks...
@@ -57,56 +59,40 @@
         Docker is up and running!
         To see how to connect your Docker Client to the Docker Engine running on this virtual machine, run: C:\Program Files\Docker\Docker\Resources\bin\docker-machine.exe env DCAYDCB
 
-    Esta solución presenta las siguientes ventajas:
-
-    * Consume menos recursos
-    * Los contenedores pueden verse entre ellos sin necesidad de configurar las redes desde VirtualBox
-
-    Podemos verificar el estado de las máquinas con este comando:
+    We can check the status of our machine using this command:
 
 
         $ docker-machine.exe ls
         NAME      ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS
-        DCAYDCB   -        virtualbox   Running   tcp://192.168.99.101:2376           v17.10.0-ce
-        default   *        virtualbox   Running   tcp://192.168.99.100:2376           v17.10.0-ce
+        DCAYDCB   *        virtualbox   Running   tcp://192.168.99.101:2376           v17.10.0-ce
 
-    Para nuestro trabajo podemos apagar la máquina "default"
+  ***Booting Windows environments where Docker QuickStart is installed***
 
-        $ docker-machine.exe stop default
-        Stopping "default"...
-        Machine "default" was stopped.
+   If you want to use Docker Quickstart instead of Docker ToolBox to boot your machine, here you have
+   the steps to do this.
 
-        $ docker-machine.exe ls
-        NAME      ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS
-        DCAYDCB   -        virtualbox   Running   tcp://192.168.99.101:2376           v17.10.0-ce
-        default   -        virtualbox   Stopped                                       Unknown
+   1) Open a Docker Quickstart window and start the virtual machine that we are using for the
+   laboratory, DCAYDCB:
+
+ ![alt text](imagenes/preparar-laboratorio.png "Preparare your lab")
 
 
-  ***Arranque de entornos Windows donde está instalado Docker QuickStart***
-
-  Alternativamente podemos usar Docker Quickstart para crearla, aquí mostramos los pasos para tener el entorno instalado.
-
-  1) Abrir una ventana de Docker Quickstart, apagamos la máquina "default"
-     y arrancamos la máquina virtual que estamos usando para el laboratorio, DCAYDCB:
-
- ![alt text](imagenes/preparar-laboratorio.png "Preparar laboratorio")
-
-
-  2) Cargamos el entorno para interactuar con el laboratorio:
+  2) Load the environment variables to interact with your lab:
 
             $ eval $(docker-machine.exe env DCAYDCB)
 
-  4) Cambiar a la carpeta "docker/windows" del repositorio Git "Workshop" y arrancar. En Windows tarda 10 minutos:
+  4) Go tho the "docker/windows" folder of your disk where you have downloaded this github repo
+    and start it. Windows is much more slow than Linux start:
 
- ![alt text](imagenes/preparar-laboratorio.png "Preparar laboratorio")
+ ![alt text](imagenes/preparar-laboratorio.png "Preparare your lab")
 
             $ cd ~/scripts
             $ ./LABORATORIOWINDOWS.sh iniciar
 
 
-  - ***Parada de entornos Windows***
+  - ***Stop the lab***
 
-  1) Cambiar a la carpeta "scripts" y parar:
+  1) Go to the "scripts" folder and stop it:
 
             $ cd ~/scripts
             $ ./LABORATORIOWINDOWS.sh parar
