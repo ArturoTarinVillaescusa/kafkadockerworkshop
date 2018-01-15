@@ -2,7 +2,7 @@
 
  Use this alternative if your environment is an Ubuntu operating system.
 
- - (https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/)[Install Docker on your Linux laptop]:
+ - [Install Docker on your Linux laptop](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/):
 
     1) Uninstall old Docker images from your laptop:
 
